@@ -1,8 +1,8 @@
-'''
+"""
 NewProject
 
 by mr_kfyzi4(Borovoj Arsenij).
-'''
+"""
 import sys
 from classes import *
 
@@ -27,11 +27,13 @@ while True:
     pressed_key = pygame.key.get_pressed()
     for event in pygame.event.get():
         if (event.type == pygame.QUIT) or (pressed_key[pygame.K_ESCAPE]):
+            Game_Engune.save_world()
             pygame.quit()
             sys.exit()
     Game_Engune.synchronize_offset_and_player_position(Player.move(block_scale))
     Game_Engune.do_lists_of_visibility(width_screen, height_screen, block_scale)
     Game_Engune.render_capture(width_screen, height_screen, screen, block_scale)
+    Game_Engune.change_block_for_place()
     Game_Engune.change_world(width_screen, height_screen, block_scale)
     block_scale = Player.change_block_scale(block_scale)
     pygame.display.update()

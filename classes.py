@@ -49,7 +49,7 @@ class Player:
 class GameEngune:
     def __init__(self):
         self.world = []
-        self.texture_list = [pygame.image.load('Assets/sky.png'), pygame.image.load('Assets/grass_block.png')]
+        self.texture_list = [pygame.image.load('Assets/sky.png'), pygame.image.load('Assets/grass_block.png'), pygame.image.load('Assets/stone.png'), pygame.image.load('Assets/16x16texture.png')]
         self.x_player_position = 50
         self.x_offset = 0
         self.y_player_position = 50
@@ -58,6 +58,7 @@ class GameEngune:
         self.coordinates_of_visibility_vertical = []
         self.length_list_of_visibility_horizontal = None
         self.length_list_of_visibility_vertical = None
+        self.block_for_place = 1
 
     @staticmethod
     def open_window(width, height):
@@ -108,19 +109,28 @@ class GameEngune:
 
     def change_world(self, width, height, block_scale):
         mouse_pressed = pygame.mouse.get_pressed()
-        if mouse_pressed[0] or mouse_pressed[2]:
+        if mouse_pressed[0] or mouse_pressed[2] or mouse_pressed[1]:
             mouse_pos = pygame.mouse.get_pos()
             x = -(block_scale * 2)  # Начальная позиция для рендеринга точек по горизонтали
             y = -(block_scale * 2) - self.y_offset  # Начальная позиция для рендеринга точек по вертикали
             for counter_at_vertical in range(int(height / block_scale + 4)):
                 for counter_at_horizontal in range(int(width / block_scale + 4)):
                     if x < mouse_pos[0] < x + block_scale and y < mouse_pos[1] < y + block_scale and mouse_pressed[0]:
-                        self.world[self.coordinates_of_visibility_horizontal[counter_at_horizontal]][self.coordinates_of_visibility_vertical[counter_at_vertical]] = 1
+                        self.world[self.coordinates_of_visibility_horizontal[counter_at_horizontal]][self.coordinates_of_visibility_vertical[counter_at_vertical]] = self.block_for_place
                     elif x < mouse_pos[0] < x + block_scale and y < mouse_pos[1] < y + block_scale and mouse_pressed[2]:
                         self.world[self.coordinates_of_visibility_horizontal[counter_at_horizontal]][self.coordinates_of_visibility_vertical[counter_at_vertical]] = 0
                     x += block_scale
                 x = -(block_scale * 2) - self.x_offset
                 y += block_scale
+
+    def change_block_for_place(self):
+        pressed_key = pygame.key.get_pressed()
+        if pressed_key[pygame.K_1]:
+            self.block_for_place = 1  # 1 is grass block
+        elif pressed_key[pygame.K_2]:
+            self.block_for_place = 2  # 2 is stone block
+        elif pressed_key[pygame.K_3]:
+            self.block_for_place = 3  # 2 is test 16x16 texture
 
     def render_capture(self, width, height, screen, block_scale):
         x = -(block_scale * 2)  # Начальная позиция для рендеринга точек по горизонтали
@@ -133,3 +143,6 @@ class GameEngune:
             x = -(block_scale * 2) - self.x_offset
             y += block_scale
         pygame.draw.rect(screen, (0, 0, 0), (width / 2 - 25, height / 2 - 25, 50, 50))
+
+    def save_world(self):
+        pass
