@@ -1,7 +1,7 @@
 '''
 NewProject
 
-by mr_kfyzi4(Borovoj Arsenij)
+by mr_kfyzi4(Borovoj Arsenij).
 '''
 import sys
 from classes import *
@@ -12,6 +12,7 @@ from classes import *
 width_screen = 1920
 height_screen = 1080
 fps = 60
+block_scale = 128
 Player = Player()  # Создаём экземпляр класса Player
 Game_Engune = GameEngune()  # Создаём экземпляр класса GameEngune
 screen = Game_Engune.open_window(width_screen, height_screen)  # Открываем окно
@@ -28,10 +29,10 @@ while True:
         if (event.type == pygame.QUIT) or (pressed_key[pygame.K_ESCAPE]):
             pygame.quit()
             sys.exit()
-    Game_Engune.synchronize_offset_and_player_position(Player.move())
-    screen.fill((255, 255, 255))
-    Game_Engune.do_lists_of_visibility(width_screen, height_screen)
-    Game_Engune.render_capture(width_screen, height_screen, screen)
-    Game_Engune.change_world(width_screen, height_screen)
+    Game_Engune.synchronize_offset_and_player_position(Player.move(block_scale))
+    Game_Engune.do_lists_of_visibility(width_screen, height_screen, block_scale)
+    Game_Engune.render_capture(width_screen, height_screen, screen, block_scale)
+    Game_Engune.change_world(width_screen, height_screen, block_scale)
+    block_scale = Player.change_block_scale(block_scale)
     pygame.display.update()
     clock.tick(fps)
