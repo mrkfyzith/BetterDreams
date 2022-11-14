@@ -13,10 +13,11 @@ width_screen = 1920
 height_screen = 1080
 fps = 60
 block_scale = 128
+world_size = [2000, 1000]
 Player = Player()  # Создаём экземпляр класса Player
 Game_Engune = GameEngune()  # Создаём экземпляр класса GameEngune
 screen = Game_Engune.open_window(width_screen, height_screen)  # Открываем окно
-Game_Engune.read_save()  # Читаем файл world.txt что-бы в дальнейшем отрендерить из него мир
+Game_Engune.read_save(world_size)  # Читаем файл world.txt что-бы в дальнейшем отрендерить из него мир
 clock = pygame.time.Clock()
 
 '''
@@ -27,7 +28,7 @@ while True:
     pressed_key = pygame.key.get_pressed()
     for event in pygame.event.get():
         if (event.type == pygame.QUIT) or (pressed_key[pygame.K_ESCAPE]):
-            Game_Engune.save_world()
+            Game_Engune.save_world(world_size)
             pygame.quit()
             sys.exit()
     Game_Engune.synchronize_offset_and_player_position(Player.move(block_scale))

@@ -38,11 +38,17 @@ class Player:
 
     @staticmethod
     def change_block_scale(block_scale):
-        pressed_key = pygame.key.get_pressed()
-        if pressed_key[pygame.K_EQUALS] and (150 > block_scale):
-            block_scale += 1
-        elif pressed_key[pygame.K_MINUS] and (75 < block_scale):
-            block_scale -= 1
+        # pressed_key = pygame.key.get_pressed()
+        # if pressed_key[pygame.K_EQUALS] and (150 > block_scale):
+        #     block_scale += 1
+        # elif pressed_key[pygame.K_MINUS] and (75 < block_scale):
+        #     block_scale -= 1
+        # return block_scale
+        for a in pygame.event.get():
+            if (a.type == pygame.MOUSEWHEEL) and (a.y == 1):
+                block_scale += 5
+            elif (a.type == pygame.MOUSEWHEEL) and (a.y == -1):
+                block_scale -= 5
         return block_scale
 
 
@@ -66,9 +72,9 @@ class GameEngune:
         pygame.display.set_caption("NewProject")  # Set window name.
         return screen
 
-    def read_save(self):
+    def read_save(self, world_size):
         os.chdir(f"{os.getcwd()}" + "\Saves")
-        sorted = numpy.zeros((100, 100))
+        sorted = numpy.zeros(world_size)
         with open("World.txt", "r") as non_sorted:
             non_sorted = non_sorted.read()
         id = str()
@@ -144,5 +150,12 @@ class GameEngune:
             y += block_scale
         pygame.draw.rect(screen, (0, 0, 0), (width / 2 - 25, height / 2 - 25, 50, 50))
 
-    def save_world(self):
-        pass
+    def save_world(self, world_size):
+        with open("World.txt", "w") as save_file:
+            for counter_at_vertical in range(world_size[1]):
+                for counter_at_horizontal in range(world_size[0]):
+                    save_file.write(str(int(self.world[counter_at_horizontal][counter_at_vertical])))
+                    if counter_at_horizontal < (world_size[0] - 1):
+                        save_file.write(",")
+                    else:
+                        save_file.write(";\n")
