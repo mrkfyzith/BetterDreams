@@ -51,6 +51,10 @@ class Player:
                 block_scale -= 5
         return block_scale
 
+    def reset_offset(self):
+        self.x_offset = 0
+        self.y_offset = 0
+
 
 class GameEngune:
     def __init__(self):
@@ -139,7 +143,7 @@ class GameEngune:
             self.block_for_place = 3  # 2 is test 16x16 texture
 
     def render_capture(self, width, height, screen, block_scale):
-        x = -(block_scale * 2)  # Начальная позиция для рендеринга точек по горизонтали
+        x = -(block_scale * 2) - self.x_offset  # Начальная позиция для рендеринга точек по горизонтали
         y = -(block_scale * 2) - self.y_offset  # Начальная позиция для рендеринга точек по вертикали
         for counter_at_vertical in range(int(height / block_scale + 4)):
             for counter_at_horizontal in range(int(width / block_scale + 4)):
