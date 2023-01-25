@@ -19,7 +19,7 @@ width_screen = 1920
 height_screen = 1080
 fps = 60
 block_scale = 128
-world_size = [2000, 1000]
+world_size = [0, 0]
 Player = PlayerClass()  # Создаём экземпляр класса Player
 Game_Engune = GameEngune()  # Создаём экземпляр класса GameEngune
 screen = Game_Engune.open_window(width_screen, height_screen)  # Открываем окно
@@ -178,7 +178,7 @@ while True:
                 if pressed_key[pygame.K_ESCAPE]:
                     wait_label.work()
                     pygame.display.update()
-                    Game_Engune.save_world(world_size)
+                    Game_Engune.save_world()
                     game_state = "MainMenu"
                     exit_from_save = True
             Game_Engune.close_window_check(True)

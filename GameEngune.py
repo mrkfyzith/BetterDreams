@@ -62,6 +62,8 @@ class GameEngune:
         self.length_list_of_visibility_vertical = None
         self.block_for_place = 1
         self.world_size = []
+        self.save_to_load_path = ""
+        self.main_path = ""
 
     @staticmethod
     def open_window(width, height):
@@ -74,7 +76,7 @@ class GameEngune:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 if if_in_game:
-                    self.save_world(self.world_size)
+                    self.save_world()
                 pygame.quit()
                 sys.exit()
 
@@ -94,13 +96,13 @@ class GameEngune:
                         save_file.write(",")
                     else:
                         save_file.write(";")
-        print("World created")
         with open("Parameters.txt", "w+") as param_file:
             param_file.write(f"{new_save_world_size[0]},{new_save_world_size[1]};\n")
         os.chdir(main_path)
-        print("Successful created new save")
 
     def load_save(self, save_to_load_path, main_path):
+        self.main_path = main_path
+        self.save_to_load_path = save_to_load_path
         self.world = None
         os.chdir(save_to_load_path)
         with open("Parameters.txt", "r") as param_file:
@@ -201,12 +203,14 @@ class GameEngune:
         pygame.draw.rect(screen, (0, 0, 0), (width / 2 - 25, height / 2 - 25, 50, 50))  # Пока это всего лишь чёрный квадрат
         self.close_window_check(True)
 
-    def save_world(self, world_size):
+    def save_world(self):
+        os.chdir(self.save_to_load_path)
         with open("World.txt", "w") as save_file:
-            for counter_at_vertical in range(world_size[1]):
-                for counter_at_horizontal in range(world_size[0]):
+            for counter_at_vertical in range(self.world_size[1]):
+                for counter_at_horizontal in range(self.world_size[0]):
                     save_file.write(str(int(self.world[counter_at_horizontal][counter_at_vertical])))
-                    if counter_at_horizontal < (world_size[0] - 1):
+                    if counter_at_horizontal < (self.world_size[0] - 1):
                         save_file.write(",")
                     else:
                         save_file.write(";\n")
+        os.chdir(self.main_path)
