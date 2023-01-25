@@ -7,7 +7,7 @@ import sys  # Импотрируем модуль sys нужный для вых
 import pygame  # Импортируем модуль pygame, при помоще него будет отрисовываться изображение
 import os
 from GameEngune import GameEngune  # Из файла GmaeEngune.py импортируем класс GameEngune
-from GameEngune import Player  # Из файла GmaeEngune.py импортируем класс Player
+from GameEngune import PlayerClass  # Из файла GmaeEngune.py импортируем класс Player
 from UserInterfaceEngune import Button  # Из файла UserInterfaceEngune.py импортируем класс Button
 from UserInterfaceEngune import Message  # Из файла UserInterfaceEngune.py импортируем класс Message
 from UserInterfaceEngune import Label  # Из файла UserInterfaceEngune.py импортируем класс Label
@@ -20,7 +20,7 @@ height_screen = 1080
 fps = 60
 block_scale = 128
 world_size = [2000, 1000]
-Player = Player()  # Создаём экземпляр класса Player
+Player = PlayerClass()  # Создаём экземпляр класса Player
 Game_Engune = GameEngune()  # Создаём экземпляр класса GameEngune
 screen = Game_Engune.open_window(width_screen, height_screen)  # Открываем окно
 clock = pygame.time.Clock()
@@ -40,7 +40,7 @@ while True:
         game_name_label.update_info((255, 255, 255), "BETTER DREAMS")
         while True:
             screen.fill((0, 0, 0))
-            GameEngune.close_window_check()
+            Game_Engune.close_window_check(False)
             start = start_button.work()
             exit = exit_button.work()
             options = options_button.work()
@@ -58,7 +58,8 @@ while True:
             pygame.display.update()
             clock.tick(fps)
     if game_state == "SavesListMenu":
-        main_menu_button = Button(10, 10, 100, 100, (128, 128, 128), screen, (128, 128, 128), 1, "back", 48)
+        wait_label = Label(screen, width_screen / 2, height_screen / 2, f"{os.getcwd()}" + "\Assets\panthera-monoletter.ttf", 128)
+        wait_label.update_info((128, 128, 128), "WAIT A SECOND...")
         game_name_label = Label(screen, width_screen / 2, height_screen / 10, f"{os.getcwd()}" + "\Assets\panthera-monoletter.ttf", 128)
         game_name_label.update_info((255, 255, 255), "BETTER DREAMS")
         save_name_label = Label(screen, width_screen / 2, height_screen / 10 * 2.5 + 13, f"{os.getcwd()}" + "\Assets\panthera-monoletter.ttf", 128)
@@ -68,6 +69,7 @@ while True:
         world_size_label = Label(screen, width_screen / 15 * 11 + 160, height_screen / 15 * 7, f"{os.getcwd()}" + "\Assets\panthera-monoletter.ttf", 64)
         world_size_label.update_info((255, 255, 255), "WORLD SIZE")
         previous_save_button = Button(width_screen / 5 * 1 - 50, height_screen / 5 * 4 - 50, 100, 100, (128, 128, 255), screen, (64, 64, 128), 1, "PREVIOUS", 28)
+        main_menu_button = Button(10, 10, 100, 100, (128, 128, 128), screen, (128, 128, 128), 1, "back", 48)
         next_save_button = Button(width_screen / 5 * 4 - 50, height_screen / 5 * 4 - 50, 100, 100, (128, 128, 255), screen, (64, 64, 128), 1, "NEXT", 45)
         play_save_button = Button(width_screen / 7 * 2, height_screen / 5 * 4 - 50, width_screen / 7 * 3, 100, (128, 128, 255), screen, (64, 64, 128), 1, "PLAY", 100)
         new_game_button = Button(width_screen / 7 * 2, height_screen / 10 * 9 - 50, width_screen / 7 * 1.5 - 25, 100, (128, 128, 255), screen, (64, 64, 128), 0.25, "NEW GAME", 64)
@@ -85,6 +87,7 @@ while True:
         choosed_save = 0
         main_path = os.getcwd()
         saves_path = f"{os.getcwd()}\Saves"
+        active_wait_label = False
         while True:
             screen.fill((0, 0, 0))
             game_name_label.work()
@@ -154,27 +157,31 @@ while True:
                     choosed_save = new_choosed_save
                 save_name_label.update_info((255, 255, 255), only_saves_dirs[choosed_save])
             if play_save_button.work():
+                active_wait_label = True
                 game_state = "InGame"
                 save_to_load_path = f"{saves_path}\Save_{choosed_save}"
+                wait_label.work()
+                pygame.display.update()
                 break
             only_saves_dirs = []
-            GameEngune.close_window_check()
+            Game_Engune.close_window_check(False)
             pygame.display.update()
             clock.tick(fps)
     if game_state == "InGame":
         Game_Engune.load_save(save_to_load_path, main_path)
         exit_from_save = False
-        while exit_from_save == False:
+        wait_label = Label(screen, width_screen / 2, height_screen / 2, f"{os.getcwd()}" + "\Assets\panthera-monoletter.ttf", 128)
+        wait_label.update_info((128, 128, 128), "WAIT A SECOND...")
+        while not exit_from_save:
             pressed_key = pygame.key.get_pressed()
             for event in pygame.event.get():
                 if pressed_key[pygame.K_ESCAPE]:
+                    wait_label.work()
+                    pygame.display.update()
                     Game_Engune.save_world(world_size)
                     game_state = "MainMenu"
                     exit_from_save = True
-                if (event.type == pygame.QUIT):
-                    Game_Engune.save_world(world_size)
-                    pygame.quit()
-                    sys.exit()
+            Game_Engune.close_window_check(True)
             Game_Engune.synchronize_offset_and_player_position(Player.move(block_scale))
             Game_Engune.do_lists_of_visibility(width_screen, height_screen, block_scale)
             Game_Engune.render_capture(width_screen, height_screen, screen, block_scale)

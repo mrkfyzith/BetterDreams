@@ -4,15 +4,16 @@ import numpy
 import sys
 
 
-class Player:
+class PlayerClass:
     def __init__(self):
-        self.speed = 14
+        self.speed = None
         self.x_offset = 0
         self.x_position = 50
         self.y_offset = 0
         self.y_position = 50
 
     def move(self, block_scale):
+        self.speed = 0.13 * block_scale
         pressed_key = pygame.key.get_pressed()
         if pressed_key[pygame.K_s]:
             self.y_offset += self.speed
@@ -39,17 +40,11 @@ class Player:
 
     @staticmethod
     def change_block_scale(block_scale):
-        # pressed_key = pygame.key.get_pressed()
-        # if pressed_key[pygame.K_EQUALS] and (150 > block_scale):
-        #     block_scale += 1
-        # elif pressed_key[pygame.K_MINUS] and (75 < block_scale):
-        #     block_scale -= 1
-        # return block_scale
-        for a in pygame.event.get():
-            if (a.type == pygame.MOUSEWHEEL) and (a.y == 1):
-                block_scale += 5
-            elif (a.type == pygame.MOUSEWHEEL) and (a.y == -1):
-                block_scale -= 5
+        pressed_key = pygame.key.get_pressed()
+        if pressed_key[pygame.K_EQUALS] and (150 > block_scale):
+            block_scale += 1
+        elif pressed_key[pygame.K_MINUS] and (75 < block_scale):
+            block_scale -= 1
         return block_scale
 
 
@@ -66,6 +61,7 @@ class GameEngune:
         self.length_list_of_visibility_horizontal = None
         self.length_list_of_visibility_vertical = None
         self.block_for_place = 1
+        self.world_size = []
 
     @staticmethod
     def open_window(width, height):
@@ -73,10 +69,12 @@ class GameEngune:
         pygame.display.set_caption("NewProject")  # Set window name.
         return screen
 
-    @staticmethod
-    def close_window_check():
+
+    def close_window_check(self, if_in_game):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                if if_in_game:
+                    self.save_world(self.world_size)
                 pygame.quit()
                 sys.exit()
 
@@ -107,7 +105,7 @@ class GameEngune:
         os.chdir(save_to_load_path)
         with open("Parameters.txt", "r") as param_file:
             raw_file = param_file.read()
-        world_size = [0, 0]
+        self.world_size = [0, 0]
         world_size_write_mode = 0
         all_number = str()
         for counter in range(len(raw_file)):
@@ -115,13 +113,13 @@ class GameEngune:
             if str(char) == "0" or str(char) == "1" or str(char) == "2" or str(char) == "3" or str(char) == "4" or str(char) == "5" or str(char) == "6" or str(char) == "7" or str(char) == "8" or str(char) == "9":
                 all_number = f"{all_number}{char}"
             elif char == ",":
-                world_size[world_size_write_mode] = int(all_number)
+                self.world_size[world_size_write_mode] = int(all_number)
                 all_number = str()
                 world_size_write_mode = 1
             elif char == ";":
-                world_size[world_size_write_mode] = int(all_number)
+                self.world_size[world_size_write_mode] = int(all_number)
                 all_number = str()
-        self.world = numpy.zeros(world_size)
+        self.world = numpy.zeros(self.world_size)
         with open("World.txt", "r") as world_file:
             raw_file = world_file.read()
         os.chdir(main_path)
@@ -146,6 +144,7 @@ class GameEngune:
         self.y_player_position = player_location[1]
         self.x_offset = player_location[2]
         self.y_offset = player_location[3]
+        self.close_window_check(True)
 
     def do_lists_of_visibility(self, width, height, block_scale):
         self.coordinates_of_visibility_horizontal = []  # В этом списке будут координаты блоков по горизонтали которые будут видны на экране
@@ -158,6 +157,7 @@ class GameEngune:
         for counter in range(int(self.y_player_position + (int(height / block_scale + 4)) / 2 - start_of_visibility_vertical)):
             start_of_visibility_vertical += 1
             self.coordinates_of_visibility_vertical.append(int(start_of_visibility_vertical))
+        self.close_window_check(True)
 
     def change_world(self, width, height, block_scale):
         mouse_pressed = pygame.mouse.get_pressed()
@@ -174,6 +174,7 @@ class GameEngune:
                     x += block_scale
                 x = -(block_scale * 2) - self.x_offset
                 y += block_scale
+        self.close_window_check(True)
 
     def change_block_for_place(self):
         pressed_key = pygame.key.get_pressed()
@@ -183,6 +184,7 @@ class GameEngune:
             self.block_for_place = 2  # 2 is stone block
         elif pressed_key[pygame.K_3]:
             self.block_for_place = 3  # 2 is test 16x16 texture
+        self.close_window_check(True)
 
     def render_capture(self, width, height, screen, block_scale):
         # Здесь блок рендеринга сырой картинки
@@ -197,6 +199,7 @@ class GameEngune:
             y += block_scale
         # Здесь мы рисуем спрайт игрока
         pygame.draw.rect(screen, (0, 0, 0), (width / 2 - 25, height / 2 - 25, 50, 50))  # Пока это всего лишь чёрный квадрат
+        self.close_window_check(True)
 
     def save_world(self, world_size):
         with open("World.txt", "w") as save_file:
